@@ -64,20 +64,23 @@ class Aws_Db_Crawler:
         self.total_count = 0
         self.fullfills = ff
     
-    def get_fullfillment_option_filter(self):
-        fullfillmentIdMap = {}
-        self.driver.implicitly_wait(100)  # Set implicit wait to 10 seconds
-        self.driver.set_page_load_timeout(300)  # Set page load timeout to 30 seconds
-        self.driver.get("https://aws.amazon.com/marketplace/search")
-        optionBox = self.driver.find_element(By.CLASS_NAME, "FULFILLMENT_OPTION_TYPEOptions")
-        options = optionBox.find_elements(By.CLASS_NAME, "awsui_wrapper_1wepg_12w0t_110")  # This may change
+    
+    # ### This is dynamically fetching filters at run time
+    # ### just writing for a taste of the wired way
+    # def get_fullfillment_option_filter(self):
+    #     fullfillmentIdMap = {}
+    #     self.driver.implicitly_wait(100)  # Set implicit wait to 10 seconds
+    #     self.driver.set_page_load_timeout(300)  # Set page load timeout to 30 seconds
+    #     self.driver.get("https://aws.amazon.com/marketplace/search")
+    #     optionBox = self.driver.find_element(By.CLASS_NAME, "FULFILLMENT_OPTION_TYPEOptions")
+    #     options = optionBox.find_elements(By.CLASS_NAME, "awsui_wrapper_1wepg_12w0t_110")  # This may change
         
-        for option in options:
-            metaData = option.get_attribute("data-metric-meta-data")
-            metaData = json.loads(metaData)
-            fullfillmentIdMap[metaData["SubComponent"]] = metaData["ComponentId"]
+    #     for option in options:
+    #         metaData = option.get_attribute("data-metric-meta-data")
+    #         metaData = json.loads(metaData)
+    #         fullfillmentIdMap[metaData["SubComponent"]] = metaData["ComponentId"]
         
-        self.fullfills = fullfillmentIdMap
+    #     self.fullfills = fullfillmentIdMap
     
     def crawl_url_from_category(self, categoryName):
         self.driver.implicitly_wait(100)  # Set implicit wait to 10 seconds
@@ -121,7 +124,7 @@ class Aws_Db_Crawler:
                     
                 # update progress bar
                 outer_pbar.update(1)
-                inner_pbar = tqdm(total=len(urls), desc=f"{len(urls)} databases")
+                inner_pbar = tqdm(total=len(urls), desc=f"{len(urls)} databases on page {curPageNum}")
                 
                 # save htmls from url
                 for urlName, urlAddr in urls.items():
@@ -148,33 +151,37 @@ class Aws_Db_Crawler:
             print(f"On page {curPageNum}, ab error occurred on {curUrl}:\n {str(e)}")
 
 
-### multi thraeding
-categories = list(Get_Categories().keys())
-totalTask = len(categories)
-with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
-    futures = []
+# ### multi thraeding
+# categories = list(Get_Categories().keys())
+# totalTask = len(categories)
+# with concurrent.futures.ThreadPoolExecutor(max_workers) as executor:
+#     futures = []
 
-    for task_id in range(max_workers):
-        crawler = Aws_Db_Crawler()
-        future = executor.submit(crawler.crawl_url_from_category, categories[task_id])
-        futures.append(future)
+#     for task_id in range(max_workers):
+#         crawler = Aws_Db_Crawler()
+#         future = executor.submit(crawler.crawl_url_from_category, categories[task_id])
+#         futures.append(future)
     
-    # Continue submitting tasks as threads become available
-    for task_id in range(max_workers, total_tasks):
-        completed_future = concurrent.futures.wait(
-            futures, return_when=concurrent.futures.FIRST_COMPLETED
-        ).done.pop()
+#     # Continue submitting tasks as threads become available
+#     for task_id in range(max_workers, total_tasks):
+#         completed_future = concurrent.futures.wait(
+#             futures, return_when=concurrent.futures.FIRST_COMPLETED
+#         ).done.pop()
         
-        # Process the completed task and remove it from the list
-        print(completed_future.result())
-        futures.remove(completed_future)
+#         # Process the completed task and remove it from the list
+#         print(completed_future.result())
+#         futures.remove(completed_future)
         
-        # Submit the next task
-        future = executor.submit(worker_function, task_id)
-        futures.append(future)
+#         # Submit the next task
+#         future = executor.submit(worker_function, task_id)
+#         futures.append(future)
     
-    # Wait for the remaining tasks to complete
-    concurrent.futures.wait(futures)
+#     # Wait for the remaining tasks to complete
+#     concurrent.futures.wait(futures)
+
+### single trhead
+crawler = Aws_Db_Crawler()
+crawler.crawl_url_from_category("financial_services")
 
 
 
