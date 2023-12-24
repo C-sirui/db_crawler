@@ -1,0 +1,25 @@
+Rsolve url
+find number of pages
+automatically change pages.
+
+
+https://aws.amazon.com/marketplace/search/results/?PRICING_UNIT=CUSTOM_UNITS&PRICING_MODEL=UPFRONT_COMMITMENT&filters=PRICING_UNIT%2CPRICING_MODEL
+https://aws.amazon.com/marketplace/search/results/?PRICING_UNIT=CUSTOM_UNITS&PRICING_MODEL=UPFRONT_COMMITMENT&filters=PRICING_UNIT%2CPRICING_MODEL
+https://aws.amazon.com/marketplace/search/results/?pageSize=50&PRICING_UNIT=CUSTOM_UNITS&PRICING_MODEL=UPFRONT_COMMITMENT&filters=PRICING_UNIT%2CPRICING_MODEL
+
+https://aws.amazon.com/marketplace/search/results/?PRICING_UNIT=CUSTOM_UNITS&PRICING_MODEL=UPFRONT_COMMITMENT&FULFILLMENT_OPTION_TYPE=HELM&filters=PRICING_UNIT%2CPRICING_MODEL%2CFULFILLMENT_OPTION_TYPE
+
+
+{"mid":"15294762491870374741620383205920322673","token":"eyJraWQiOiIyNGRhOWNmZi1mOTJjLTQ3ZTEtYWY2My01YmEyN2M2MTQwNmYiLCJ0eXAiOiJjb20uYXdzLmFtYXpvbi5kMmMudnMrSldUIiwiYWxnIjoiUlMyNTYifQ.eyJ2aWQiOiJjY2M2NGJiZS01MDRiLWU0NGItZTYxYi0zYjA2ZjI5OTEwNGIiLCJpc3MiOiJodHRwczpcL1wvdnMuYXdzLmFtYXpvbi5jb20iLCJtaWQiOiIxNTI5NDc2MjQ5MTg3MDM3NDc0MTYyMDM4MzIwNTkyMDMyMjY3MyIsImV4cCI6MTcwMzM1MDAwNCwiaWF0IjoxNzAzMzQ5NDA0fQ.HHt4wmbrA01aozvzzvOT8PI5gcofnh80_vwfK-3prtvxb5B_WzbWQvnkjICF49oULALYvjeXcmBslrHJszULxW-l0IhuOT4EddnhL9IQa3vN4gBEPll1J1EGekB0KaGB7_ZHD9O50zbyPjcGEGS7DRdAIudPsDNhowz4gJOz3TYcK1U7Emd39j-ljiiUOXD7LBCk8IbKvJzpA8R4M8VqNKWnj4XG832ZPqbmPIMmi_Rqj4bXoTfohQG3kieenZHq_ZDRlLzrvCefb7gJnp8_MwLmw-NFHin_EFB-K0TC2lwF1lwTeYgrWW1kH81NoKCi76WWj_xu7gxv6vPWusl67Q"}
+
+import requests
+
+r = requests.post(
+    "https://aws.amazon.com/marketplace/search/results",
+    data={
+        "RCEPT_NO": "",
+        "search_flag": "N",
+        "page": "5"
+    })
+
+soup = BeautifulSoup(r.text, 'lxml')
