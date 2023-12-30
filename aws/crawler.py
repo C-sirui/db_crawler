@@ -33,6 +33,7 @@ def Initialize_Driver():
     service = webdriver.chrome.service.Service(chromedriver_path)
     chrome_options = webdriver.ChromeOptions()
    
+    chrome_options.add_argument("--disable-gpu")
     chrome_options.add_experimental_option("excludeSwitches", ['enable-automation', 'disable-component-update','ignore-certificate-errors'])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     chrome_options.add_argument("--headless")
@@ -83,6 +84,7 @@ class Aws_Db_Crawler:
 
         # Switch to the new tab
         self.driver.switch_to.window(self.driver.window_handles[-1])
+        time.sleep(2)
 
     def close_current_tab(self):
         # Close the current tab
@@ -164,15 +166,15 @@ class Aws_Db_Crawler:
                     with open(os.path.join(htmlStorePath, f"{tag}_{safeUrlName}.html"), "w", encoding="utf-8") as html_file:
                         if status == 200:
                             self.wait.until(
-                                EC.presence_of_all_elements_located((By.CLASS_NAME, 'awsui_content-wrapper_14iqq_1yco7_189')),
+                                EC.presence_of_all_elements_located((By.CLASS_NAME, 'content'))
                             )
                             self.wait.until(
-                                EC.presence_of_all_elements_located((By.CLASS_NAME, 'content'))
+                                EC.presence_of_all_elements_located((By.CLASS_NAME, 'awsui_content-wrapper_14iqq_1yco7_189')),
                             )
                             self.wait.until(
                                 EC.presence_of_all_elements_located((By.CLASS_NAME, 'header-content__description'))
                             )
-                            
+                     
                             temp = self.driver.find_element(By.CLASS_NAME, "content")
                             renderedHtml = temp.get_attribute('outerHTML')
                             html_file.write(renderedHtml)
@@ -349,10 +351,9 @@ class Aws_Db_Crawler:
 #     concurrent.futures.wait(futures)
 
 ### single
-### done categories: "gaming_data"
-categories = ["healthcare_and_life_sciences_data", "media_and_entertainment_data", 
-              "telecommunications_data", "financial_services_data", "automotive_data", "manufacturing_data", "resources_data", 
-              "retail_location_and_marketing_data", "public_sector_data", "environmental_data"]
+### done categories: "gaming_data", "healthcare_and_life_sciences_data", "media_and_entertainment_data", 
+              #      "telecommunications_data", "financial_services_data", "automotive_data", "manufacturing_data", "resources_data", "retail_location_and_marketing_data",
+categories = [ "public_sector_data", "environmental_data"]
 
 
 crawler = Aws_Db_Crawler()

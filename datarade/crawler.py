@@ -20,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from markdownify import MarkdownConverter
 from markdownify import markdownify as md
 from account import username, password
+from selenium.common.exceptions import TimeoutException
 
 links_per_page = 10
 
@@ -91,8 +92,14 @@ class Dataraide_Db_Crawler:
         time.sleep(2)
               
     def crawl_by_categories(self, categoryName):
+        # self.driver.implicitly_wait(100)  # Set implicit wait to 10 seconds
+        self.driver.set_page_load_timeout(15)  # Set page load timeout to 30 seconds
         page1 = self.get_search_link(1, categoryName)
-        self.driver.get(page1)
+        
+        try:
+            self.driver.get(page1)
+        except TimeoutException:
+            pass
     
         # storage path
         htmlStorePath = os.path.join(os.getcwd(), f"htmls/{categoryName}")
@@ -120,9 +127,12 @@ class Dataraide_Db_Crawler:
         try: # for page
             for pageNum in range(1, totalDbCount+1):
                 curPageNum = pageNum
-                self.driver.get(self.get_search_link(pageNum, categoryName))
+                try:
+                    self.driver.get(self.get_search_link(pageNum, categoryName))
+                except TimeoutException:
+                    pass
                 self.wait.until(
-                    EC.presence_of_all_elements_located((By.XPATH, "//*[starts-with(@alt, 'Logo for')]")),
+                    EC.presence_of_element_located((By.XPATH, "//*[starts-with(@alt, 'Logo for')]")),
                 )
                 dbs = {}
                 # Find the all urls on the page
